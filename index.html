@@ -1,342 +1,438 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Food Waste Training | Presentation + Green Machine + Game</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<html lang="en-us"><script src="https://pygame-web.github.io/cdn/0.9.3/pythons.js" type=module id="site" data-python="python3.12" data-LINES=42 data-COLUMNS=132 data-os="vtx,snd,gui" async defer>#<!--
 
-    body {
-      background: #392B01;  /* Dark brown main background */
-      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, 'Roboto', sans-serif;
-      color: #FDFDFC;  /* White text */
-      padding: 2rem 1.5rem;
-    }
+print("""
+Loading websitefoodwastegame from websitefoodwastegame.apk
+    Pygbag Version : 0.9.3
+    Template Version : 0.9.3
+    Python  : 3.12
+    CDN URL : https://pygame-web.github.io/cdn/0.9.3/
+    Screen  : 1280x720
+    Title   : websitefoodwastegame
+    Folder  : websitefoodwastegame
+    Authors : pgw
+    SPDX-License-Identifier: cookiecutter.spdx
 
-    .dashboard {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
+""")
 
-    .hero {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    .hero h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #DAA71B, #F5C542);  /* Gold gradient */
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      letter-spacing: -0.5px;
-    }
-    .hero p {
-      color: #E5DBBD;  /* Light beige for subtitle */
-      margin-top: 0.5rem;
-      font-size: 1.1rem;
-    }
+import sys
+import asyncio
+import platform
+import json
+from pathlib import Path
 
-    /* 3 column grid */
-    .grid-triptych {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.8rem;
-      margin-bottom: 2rem;
-    }
+# do not rename
+async def custom_site():
+    import embed
+    platform.document.body.style.background = "#7f7f7f"
 
-    .card {
-      background: #76694B;  /* Tan / muted accent background */
-      backdrop-filter: blur(2px);
-      border-radius: 2rem;
-      border: 1px solid #DAA71B;  /* Gold border accent */
-      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 25px 40px -14px rgba(0, 0, 0, 0.6);
-      border-color: #F5C542;
-    }
+    platform.window.transfer.hidden = true
+    platform.window.canvas.style.visibility = "visible"
 
-    .card-header {
-      padding: 1.2rem 1.5rem 0.6rem 1.5rem;
-      border-bottom: 2px solid #DAA71B;  /* Gold accent border */
-      background: #5C4E34;  /* Darker tan for header */
-    }
-    .card-header h2 {
-      font-size: 1.6rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      color: #FDFDFC;
-    }
 
-    .card-content {
-      padding: 1.2rem;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
+    bundle = "websitefoodwastegame"
 
-    /* Embed containers */
-    .embed-container {
-      background: #E5DBBD;  /* Light beige background for embed area */
-      border-radius: 1.2rem;
-      overflow: hidden;
-      border: 1px solid #DAA71B;
-      height: 450px;
-      display: flex;
-      flex-direction: column;
-    }
+    # the C or js loader could do that but be explicit.
+    appdir = Path(f"/data/data/{bundle}") # /data/data/websitefoodwastegame
+    appdir.mkdir()
 
-    .embed-header {
-      background: #392B01;  /* Dark brown header */
-      padding: 0.6rem 1rem;
-      font-size: 0.8rem;
-      color: #E5DBBD;
-      border-bottom: 1px solid #DAA71B;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
 
-    .embed-header-left {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+    # unpack filesystem from compressed archive into work dir
+    if platform.window.location.host.find('.itch.zone')>0:
+        import zipfile
+        async with platform.fopen("websitefoodwastegame.apk", "rb") as archive:
+            with zipfile.ZipFile(archive) as zip_ref:
+                zip_ref.extractall(appdir.as_posix())
+    else:
+        import tarfile
+        async with platform.fopen("websitefoodwastegame.tar.gz", "rb") as archive:
+            tar = tarfile.open(fileobj=archive, mode="r:gz")
+            tar.extractall(path=appdir.as_posix(), filter='tar')
+            tar.close()
 
-    .fullscreen-btn {
-      background: #DAA71B;
-      border: none;
-      color: #392B01;
-      font-size: 0.7rem;
-      padding: 0.25rem 0.6rem;
-      border-radius: 20px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: all 0.2s ease;
-      font-family: inherit;
-    }
+    # preloader will change to work dir and prepend it to sys.path
+    platform.run_main(PyConfig, loaderhome= appdir / "assets", loadermain=None)
 
-    .fullscreen-btn:hover {
-      background: #F5C542;
-      transform: scale(1.02);
-    }
 
-    .embed-frame {
-      flex: 1;
-      width: 100%;
-      border: none;
-      background: #FDFDFC;
-    }
+    # wait preloading complete : that includes images and wasm compilation of bundled modules
+    while embed.counter()<0:
+        await asyncio.sleep(.1)
 
-    /* PDF specific - center the iframe content */
-    .pdf-container {
-      background: #E5DBBD;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      width: 100%;
-    }
+    main = appdir / "assets" / "main.py"
 
-    .pdf-container iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-    }
+    # TODO: test for window.webkitAudioContext and block aio loop until gesture if accessing media manager play
+    # before a gesture is recorded ( touch or click )
 
-    /* Game container for iframe or embed */
-    .game-container {
-      background: #E5DBBD;
-      border-radius: 1.2rem;
-      overflow: hidden;
-      border: 1px solid #DAA71B;
-      height: 450px;
-      width: 100%;
-    }
-    
-    .game-frame {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: #FDFDFC;
-    }
+    # test/wait user media interaction
+    if not platform.window.MM.UME:
 
-    .footer-note {
-      text-align: center;
-      margin-top: 2rem;
-      font-size: 0.85rem;
-      color: #E5DBBD;
-      border-top: 1px solid #DAA71B;
-      padding-top: 1.5rem;
-    }
+        # now that apk is mounted we have access to font cache
+        # but we need to fill __file__ that is not yet set
+        __import__(__name__).__file__ = main
 
-    /* Fix for iframe display */
-    iframe {
-      display: block;
-    }
+        # now make a prompt
+        msg  = "Ready to start ! Please click/touch page"
+        platform.window.infobox.innerText = msg
+        print("\n"*4, f"    * Waiting for media user engagement. {msg} *" , "\n"*4)
 
-    @media (max-width: 900px) {
-      .grid-triptych {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-      }
-      body {
-        padding: 1rem;
-      }
-    }
+        while not platform.window.MM.UME:
+            await asyncio.sleep(.1)
 
-    /* Additional styling for buttons and interactive elements */
-    ::selection {
-      background: #DAA71B;
-      color: #392B01;
-    }
+    # start async top level machinery if not started and add a console in any case if requested.
+    await TopLevel_async_handler.start_toplevel(platform.shell, console=window.python.config.debug)
 
-    /* Scrollbar styling */
-    ::-webkit-scrollbar {
-      width: 10px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #392B01;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #DAA71B;
-      border-radius: 5px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #F5C542;
-    }
-  </style>
-</head>
-<body>
-<div class="dashboard">
-  <div class="hero">
-    <h1>Food Waste Training</h1>
-    <p>Presentation · Green Machine · Training Game</p>
-  </div>
+    # now that apk is mounted we have access to font cache
+    # but we need to fill __file__/__name__ that are not yet set
+    __import__(__name__).__file__ = main
 
-  <div class="grid-triptych">
-    <!-- GOOGLE SLIDES PRESENTATION - automatically embedded -->
-    <div class="card">
-      <div class="card-header">
-        <h2>Presentation</h2>
-      </div>
-      <div class="card-content">
-        <div class="embed-container">
-          <div class="embed-header">
-            <span>Food Waste Awareness Slides</span>
-            <span style="font-size: 0.7rem;">click dots for fullscreen</span>
-          </div>
-          <iframe class="embed-frame" src="https://docs.google.com/presentation/d/e/2PACX-1vRU_nvu95Qy21qo1WaSXGhkGr6KX0gs_4dq1lkoS7KpXU2J3lFn8rnaK6BVvZMhFvc1nWOUJxC4zkFc/pubembed?start=false&loop=false&delayms=3000" frameborder="0" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
-        </div>
-      </div>
-    </div>
 
-    <!-- PICTURE BOOK (PDF) - fixed centering + fullscreen button -->
-    <div class="card">
-      <div class="card-header">
-        <h2>Green Machine Storybook</h2>
-      </div>
-      <div class="card-content">
-        <div class="embed-container" id="pdfEmbedContainer">
-          <div class="embed-header">
-            <div class="embed-header-left">
-              <span>The Green Machine Saves Food</span>
-            </div>
-            <button class="fullscreen-btn" id="pdfFullscreenBtn">⛶ Fullscreen</button>
-          </div>
-          <div class="pdf-container" id="pdfContainer">
-            <iframe id="pdfIframe" src="https://drive.google.com/file/d/1OFOIl5vXRXZOjvFikx9yqnywVp2rlcHb/preview" title="Green Machine Storybook PDF" allowfullscreen></iframe>
-          </div>
-        </div>
-      </div>
-    </div>
+    def ui_callback(pkg):
+        platform.window.infobox.innerText = f"installing {pkg}"
 
-    <!-- 3️⃣ PYGAME / CUSTOM GAME - automatically embedded -->
-    <div class="card">
-      <div class="card-header">
-        <h2>Food Waste Game</h2>
-      </div>
-      <div class="card-content">
-        <div class="game-container">
-          <iframe class="game-frame" 
-            src="https://your-pygame-webgl.netlify.app/"
-            title="Food Waste Training Game - Interactive Learning"
-            allowfullscreen="true"
-            allow="autoplay; fullscreen">
-          </iframe>
-        </div>
-      </div>
-    </div>
-  </div>
+    await shell.source(main, callback=ui_callback)
 
-  <div class="footer-note">
-    Reducing food waste starts with knowledge — explore, read, and play to make a difference.
-  </div>
-</div>
+    # if you don't reach that step
+    # your main.py has an infinite sync loop somewhere !
 
-<script>
-  // Fullscreen functionality for PDF viewer
-  const pdfFullscreenBtn = document.getElementById('pdfFullscreenBtn');
-  const pdfContainer = document.getElementById('pdfContainer');
-  const pdfIframe = document.getElementById('pdfIframe');
+    platform.window.infobox.style.display = "none"
+    platform.window.config.gui_divider = 1
+    platform.window.window_resize()
+    print("default.tmpl: done")
 
-  function toggleFullscreen(element) {
-    if (!document.fullscreenElement) {
-      // Enter fullscreen
-      if (element.requestFullscreen) {
-        element.requestFullscreen();
-      } else if (element.webkitRequestFullscreen) { /* Safari */
-        element.webkitRequestFullscreen();
-      } else if (element.msRequestFullscreen) { /* IE/Edge */
-        element.msRequestFullscreen();
-      }
-      pdfFullscreenBtn.textContent = '✖ Exit';
-    } else {
-      // Exit fullscreen
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
-      pdfFullscreenBtn.textContent = '⛶ Fullscreen';
-    }
-  }
+    shell.interactive()
 
-  // Attach click event to fullscreen button
-  pdfFullscreenBtn.addEventListener('click', () => {
-    toggleFullscreen(pdfContainer);
-  });
+asyncio.run( custom_site() )
 
-  // Update button text when fullscreen changes (e.g., ESC key)
-  document.addEventListener('fullscreenchange', updateFullscreenButton);
-  document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
-  document.addEventListener('msfullscreenchange', updateFullscreenButton);
 
-  function updateFullscreenButton() {
-    if (document.fullscreenElement) {
-      pdfFullscreenBtn.textContent = '✖ Exit';
-    } else {
-      pdfFullscreenBtn.textContent = '⛶ Fullscreen';
-    }
-  }
+
+
+
+
+
+
+
+
+
+
+# BEGIN BLOCK
+#
+# now this is the html part you can (and should) customize
+# It is not mandatory : pygame-script when it reads the first line (also called
+# shebang ) of above code create absolute minimal widget set
+# required for running with default rules
+#
+# do not alter that comment block it is separating python code from html code
+# =============================================================================
+# --></script><head><!--
+//=============================================================================
+//
+//
+//
+//
+//
+//
+//
+
+    {%- if cookiecutter.comment != "" -%}
+{{cookiecutter.comment}}
+    {% endif %}
+
+--><script type="application/javascript">
+// END BLOCK
+
+
+
+// this dict is available under PyConfig.config from __main__
+
+config = {
+    xtermjs : "1" ,
+    _sdl2 : "canvas",
+    user_canvas : 0,
+    user_canvas_managed : 0,
+    gui_divider : 2,
+    ume_block : 1,
+    can_close : 0,
+    archive : "websitefoodwastegame",
+    gui_debug : 2,
+    cdn : "https://pygame-web.github.io/cdn/0.9.3/",
+    autorun : 0,
+    PYBUILD : "3.12",
+    fb_ar   :  1.77,
+    fb_width : "1280",
+    fb_height : "720"
+}
+
+function show_infobox() {
+    infobox.style.display = "block";
+
+    // Measure box
+    const w = infobox.offsetWidth;
+    const h = infobox.offsetHeight;
+
+    // Center in viewport
+    const left = (window.innerWidth - w) / 2;
+    const top = (window.innerHeight - h) / 2;
+
+    infobox.style.left = left + "px";
+    infobox.style.top = top + "px";
+}
+
 </script>
 
+    <title>websitefoodwastegame</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="height=device-height, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+
+
+    <link rel="icon" type="image/png" href="favicon.png" sizes="16x16">
+
+    <style>
+        #status {
+            display: inline-block;
+            vertical-align: top;
+            margin-top: 20px;
+            margin-left: 30px;
+            font-weight: bold;
+            color: rgb(120, 120, 120);
+        }
+
+        #progress {
+            height: 20px;
+            width: 300px;
+        }
+
+        #infobox {
+            position: fixed; /* center relative to viewport */
+            background: green;
+            color: blue;
+            font-weight: bold;
+            padding: 12px 24px;
+ /*           display: none; */
+            z-index: 999999;
+        }
+        div.emscripten { text-align: center; }
+        div.emscripten_border { border: 1px solid black; }
+        div.thick_border { border: 4px solid black; }
+
+        /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+        /* average size of droid screen 470dp x 320dp  */
+        canvas.emscripten {
+            border: 0px none;
+            background-color: transparent;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+
+            padding: 0;
+            margin: 0 auto;
+
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        body {
+            font-family: arial;
+            margin: 0;
+            padding: none;
+            background-color:powderblue;
+        }
+
+        .topright{
+           position:absolute;
+           top:0px;
+           right:0px;
+        }
+
+        .bottomright {
+            position:absolute;
+            top: 40%;
+            right: 0px;
+        }
+
+        .center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .trinfo{
+           position: relative;
+           right: 0px;
+           border: 1px solid black;
+        }
+
+        .framed{
+           position: relative;
+           top: 150px;
+           right: 10px;
+           border: 1px solid black;
+        }
+    </style>
+
+    <script>
+/*
+        if (navigator.serviceWorker)
+            navigator.serviceWorker.register("https://pygame-web.github.io/cdn/0.9.3/pygbag0.9.3.js")
+        else
+            console.warn("Service workers not supported")
+*/
+    </script>
+
+    <script src="https://pygame-web.github.io/cdn/0.9.3//browserfs.min.js"></script>
+
+</head>
+
+<body>
+
+    <div id="transfer" align=center>
+<!--        <div class="spinner" id='spinner'></div> -->
+        <div class="emscripten" id="status">Downloading...</div>
+        <div class="emscripten">
+            <progress value="0" max="100" id="progress"></progress>
+        </div>
+    </div>
+
+
+
+    <canvas class="emscripten" id="canvas"
+width="1px"
+height="1px"
+    oncontextmenu="event.preventDefault()" tabindex=1>
+    </canvas>
+
+    <canvas class="emscripten" id="canvas3d"
+width="1280px"
+height="720px"
+    oncontextmenu="event.preventDefault()" tabindex=1 hidden>
+    </canvas>
+
+    <div id="infobox">Loading, please wait ...</div>
+
+    <div id=html></div>
+
+    <div id=crt  class=bottomright >
+
+        <div id="system" hidden>
+            <div class="button-container">
+                <button id="aiostop" disabled>AIO ⏏︎</button>
+                <button id="aiopaused_true" disabled>AIO ■</button>
+                <button id="aiopaused_false" disabled>AIO ▶</button>
+                <button id="pygame_mixer_music_pause" disabled>Music ■</button>
+            </div>
+
+            <div class="button-container">
+                <div id=load_min>min</div>
+                <div id=load_avg>avg</div>
+                <div id=load_max>max</div>
+              <button id="load_rst" disabled>RESET</button>
+            </div>
+
+            <div id="level">(battery level unknown)</div>
+            <div id="stateBattery">(charging state unknown)</div>
+
+        </div>
+
+        <div id=box class="emscripten_border" hidden=true>
+
+            <div id="info" class="trinfo"></div>
+
+            <iframe id="iframe" class="framed" name="iframe"
+width="470px" height="90%"
+allowtransparency="true"
+style="z-index: 10;"
+style="background: #FFFFFF;"
+frameborder="1"
+                allowfullscreen="true"
+                webkitallowfullscreen="true"
+                msallowfullscreen="true"
+                mozallowfullscreen="true"
+                sandbox="allow-same-origin allow-top-navigation allow-scripts allow-pointer-lock"
+                allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; cross-origin-isolated"
+                src="https://pygame-web.github.io/cdn/0.9.3/empty.html"
+                scrolling="yes">
+            </iframe>
+        </div>
+
+    </div>
+
+
+    <div id="dlg" hidden>
+        <input type="file" id="dlg_multifile" multiple accept="image/*">
+        <label for="dlg_multifile">Select files</label>
+    </div>
+
+    <div id="pyconsole">
+        <div id="terminal" tabIndex=1 align="left"></div>
+    </div>
+
+    <script type="application/javascript">
+
+    globalThis.__canvas_resized = (self, ecw, ech) => {
+        console.warn("TODO: panda3d canvas monitor", self, ecw, ech)
+    }
+
+    async function custom_onload(debug_hidden) {
+        // this is called before anything python is loaded
+        // make your js customization here
+        console.log(__FILE__, "custom_onload")
+
+        pyconsole.hidden = debug_hidden
+        system.hidden = debug_hidden
+        transfer.hidden = debug_hidden
+        info.hidden = debug_hidden
+        box.hidden =  debug_hidden
+
+        show_infobox()
+    }
+
+    function custom_prerun(){
+        // no python main and no (MEMFS + VFS) yet.
+        console.log(__FILE__, "custom_prerun")
+
+    }
+
+    function custom_postrun(){
+        // python main and no VFS filesystem yet.
+        console.log(__FILE__, "custom_postrun")
+
+    }
+
+    function debug() {
+        // allow to gain access to dev tools from js console
+        // but only on desktop. difficult to reach when in iframe
+        python.config.debug = true
+        custom_onload(false)
+        Module.PyRun_SimpleString("shell.uptime()")
+        window_resize()
+    }
+
+    function info_inline(data){
+        document.getElementById("info").innerHTML = data
+    }
+
+    function info_online(url) {
+        // display info about current APK
+        fetch( url /*, options */)
+            .then((response) => response.text())
+            .then((html) => {
+                info_inline(html);
+        })
+        .catch((error) => {
+            console.warn(error);
+        });
+    }
+
+    function frame_online(url) {
+        window.frames["iframe"].location = url;
+    }
+
+    </script>
 
 </body>
 </html>
