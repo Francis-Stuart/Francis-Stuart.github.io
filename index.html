@@ -12,9 +12,9 @@
     }
 
     body {
-      background: #392B01;  /* Dark brown main background */
+      background: #392B01;
       font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, 'Roboto', sans-serif;
-      color: #FDFDFC;  /* White text */
+      color: #FDFDFC;
       padding: 2rem 1.5rem;
     }
 
@@ -30,19 +30,18 @@
     .hero h1 {
       font-size: 2.5rem;
       font-weight: 700;
-      background: linear-gradient(135deg, #DAA71B, #F5C542);  /* Gold gradient */
+      background: linear-gradient(135deg, #DAA71B, #F5C542);
       background-clip: text;
       -webkit-background-clip: text;
       color: transparent;
       letter-spacing: -0.5px;
     }
     .hero p {
-      color: #E5DBBD;  /* Light beige for subtitle */
+      color: #E5DBBD;
       margin-top: 0.5rem;
       font-size: 1.1rem;
     }
 
-    /* 3 column grid */
     .grid-triptych {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -51,10 +50,10 @@
     }
 
     .card {
-      background: #76694B;  /* Tan / muted accent background */
+      background: #76694B;
       backdrop-filter: blur(2px);
       border-radius: 2rem;
-      border: 1px solid #DAA71B;  /* Gold border accent */
+      border: 1px solid #DAA71B;
       box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
       display: flex;
       flex-direction: column;
@@ -69,8 +68,8 @@
 
     .card-header {
       padding: 1.2rem 1.5rem 0.6rem 1.5rem;
-      border-bottom: 2px solid #DAA71B;  /* Gold accent border */
-      background: #5C4E34;  /* Darker tan for header */
+      border-bottom: 2px solid #DAA71B;
+      background: #5C4E34;
     }
     .card-header h2 {
       font-size: 1.6rem;
@@ -88,9 +87,8 @@
       flex-direction: column;
     }
 
-    /* Embed containers */
     .embed-container {
-      background: #E5DBBD;  /* Light beige background for embed area */
+      background: #E5DBBD;
       border-radius: 1.2rem;
       overflow: hidden;
       border: 1px solid #DAA71B;
@@ -100,7 +98,7 @@
     }
 
     .embed-header {
-      background: #392B01;  /* Dark brown header */
+      background: #392B01;
       padding: 0.6rem 1rem;
       font-size: 0.8rem;
       color: #E5DBBD;
@@ -141,7 +139,6 @@
       background: #FDFDFC;
     }
 
-    /* PDF specific - center the iframe content */
     .pdf-container {
       background: #E5DBBD;
       display: flex;
@@ -158,7 +155,6 @@
       display: block;
     }
 
-    /* Game container for iframe or embed */
     .game-container {
       background: #E5DBBD;
       border-radius: 1.2rem;
@@ -166,11 +162,13 @@
       border: 1px solid #DAA71B;
       height: 450px;
       width: 100%;
+      display: flex;
+      flex-direction: column;
     }
     
     .game-frame {
       width: 100%;
-      height: 100%;
+      flex: 1;
       border: none;
       background: #FDFDFC;
     }
@@ -184,7 +182,6 @@
       padding-top: 1.5rem;
     }
 
-    /* Fix for iframe display */
     iframe {
       display: block;
     }
@@ -199,13 +196,11 @@
       }
     }
 
-    /* Additional styling for buttons and interactive elements */
     ::selection {
       background: #DAA71B;
       color: #392B01;
     }
 
-    /* Scrollbar styling */
     ::-webkit-scrollbar {
       width: 10px;
     }
@@ -229,7 +224,7 @@
   </div>
 
   <div class="grid-triptych">
-    <!-- GOOGLE SLIDES PRESENTATION - automatically embedded -->
+    <!-- GOOGLE SLIDES PRESENTATION -->
     <div class="card">
       <div class="card-header">
         <h2>Presentation</h2>
@@ -245,7 +240,7 @@
       </div>
     </div>
 
-    <!-- PICTURE BOOK (PDF) - fixed centering + fullscreen button -->
+    <!-- PICTURE BOOK (PDF) -->
     <div class="card">
       <div class="card-header">
         <h2>Green Machine Storybook</h2>
@@ -265,19 +260,26 @@
       </div>
     </div>
 
-    <!-- 3️⃣ PYGAME / CUSTOM GAME - automatically embedded -->
+    <!-- PYGAME GAME with fullscreen button -->
     <div class="card">
       <div class="card-header">
         <h2>Food Waste Game</h2>
       </div>
       <div class="card-content">
-        <div class="game-container">
-            <iframe class="game-frame" 
-              src="game/"
-              title="Food Waste Training Game"
-              allowfullscreen="true"
-              allow="autoplay; fullscreen">
-            </iframe>
+        <div class="game-container" id="gameContainer">
+          <div class="embed-header">
+            <div class="embed-header-left">
+              <span>Drag items to correct waste bin</span>
+            </div>
+            <button class="fullscreen-btn" id="gameFullscreenBtn">⛶ Fullscreen</button>
+          </div>
+          <iframe class="game-frame" 
+            id="gameIframe"
+            src="game/"
+            title="Food Waste Training Game"
+            allowfullscreen="true"
+            allow="autoplay; fullscreen">
+          </iframe>
         </div>
       </div>
     </div>
@@ -292,21 +294,18 @@
   // Fullscreen functionality for PDF viewer
   const pdfFullscreenBtn = document.getElementById('pdfFullscreenBtn');
   const pdfContainer = document.getElementById('pdfContainer');
-  const pdfIframe = document.getElementById('pdfIframe');
 
   function toggleFullscreen(element) {
     if (!document.fullscreenElement) {
-      // Enter fullscreen
       if (element.requestFullscreen) {
         element.requestFullscreen();
-      } else if (element.webkitRequestFullscreen) { /* Safari */
+      } else if (element.webkitRequestFullscreen) {
         element.webkitRequestFullscreen();
-      } else if (element.msRequestFullscreen) { /* IE/Edge */
+      } else if (element.msRequestFullscreen) {
         element.msRequestFullscreen();
       }
       pdfFullscreenBtn.textContent = '✖ Exit';
     } else {
-      // Exit fullscreen
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if (document.webkitExitFullscreen) {
@@ -318,25 +317,48 @@
     }
   }
 
-  // Attach click event to fullscreen button
   pdfFullscreenBtn.addEventListener('click', () => {
     toggleFullscreen(pdfContainer);
   });
 
-  // Update button text when fullscreen changes (e.g., ESC key)
-  document.addEventListener('fullscreenchange', updateFullscreenButton);
-  document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
-  document.addEventListener('msfullscreenchange', updateFullscreenButton);
+  document.addEventListener('fullscreenchange', updatePdfFullscreenButton);
+  document.addEventListener('webkitfullscreenchange', updatePdfFullscreenButton);
+  document.addEventListener('msfullscreenchange', updatePdfFullscreenButton);
 
-  function updateFullscreenButton() {
+  function updatePdfFullscreenButton() {
     if (document.fullscreenElement) {
       pdfFullscreenBtn.textContent = '✖ Exit';
     } else {
       pdfFullscreenBtn.textContent = '⛶ Fullscreen';
     }
   }
-</script>
 
+  // Fullscreen functionality for Game
+  const gameFullscreenBtn = document.getElementById('gameFullscreenBtn');
+  const gameContainer = document.getElementById('gameContainer');
+
+  gameFullscreenBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      gameContainer.requestFullscreen();
+      gameFullscreenBtn.textContent = '✖ Exit';
+    } else {
+      document.exitFullscreen();
+      gameFullscreenBtn.textContent = '⛶ Fullscreen';
+    }
+  });
+
+  document.addEventListener('fullscreenchange', updateGameFullscreenButton);
+  document.addEventListener('webkitfullscreenchange', updateGameFullscreenButton);
+  document.addEventListener('msfullscreenchange', updateGameFullscreenButton);
+
+  function updateGameFullscreenButton() {
+    if (document.fullscreenElement) {
+      gameFullscreenBtn.textContent = '✖ Exit';
+    } else {
+      gameFullscreenBtn.textContent = '⛶ Fullscreen';
+    }
+  }
+</script>
 
 </body>
 </html>
